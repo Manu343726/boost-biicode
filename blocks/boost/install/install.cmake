@@ -201,7 +201,20 @@ function(__BII_BOOST_INSTALL)
 
         set(__BII_BOOST_B2_CALL ${__BII_BOOST_B2_CALL} cxxflags="-stdlib=libc++" linkflags="-stdlib=libc++" ${SCOPE})
     endif()
-    
+
+    if(CMAKE_CROSSCOMPILING)
+      BII_BOOST_COMPUTE_TOOLSET_NAME(BII_BOOST_TOOLSET_NAME)
+      file(WRITE ${BII_BOOST_DIR}/user-config.jam "using ${BII_BOOST_TOOLSET_NAME} : : ${CMAKE_CXX_COMPILER} : <rc>${CMAKE_RC_COMPILER} <archiver>${CMAKE_AR} <ranlib>${CMAKE_RANLIB} ;")
+
+      set(__BII_BOOST_B2_CALL ${__BII_BOOST_B2_CALL} --user-config=${BII_BOOST_DIR}/user-config.jam ${SCOPE})
+
+      if (WIN32)
+        set(__BII_BOOST_B2_CALL ${__BII_BOOST_B2_CALL} target-os=windows threadapi=win32 ${SCOPE})
+      else()
+        message(FATAL_ERROR "Target not supported for cross compiling. Stopping Boost installation")
+      endif()
+    endif()
+
     #Boost
 
     #FindBoost directories

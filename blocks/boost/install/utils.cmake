@@ -44,7 +44,7 @@ function(COMPILER_VERSION _ret)
   set(${_ret} ${__version} PARENT_SCOPE)
 endfunction()
 
-function(BII_BOOST_COMPUTE_TOOLSET _ret)
+function(BII_BOOST_COMPUTE_TOOLSET_NAME _ret)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel"
       OR CMAKE_CXX_COMPILER MATCHES "icl"
       OR CMAKE_CXX_COMPILER MATCHES "icpc")
@@ -60,7 +60,11 @@ function(BII_BOOST_COMPUTE_TOOLSET _ret)
 	else()
 		message(FATAL_ERROR "Unknown compiler, unable to compute toolset")
 	endif()
+	set(${_ret} ${__toolset_name} PARENT_SCOPE)
+endfunction()
 
+function(BII_BOOST_COMPUTE_TOOLSET _ret)
+	BII_BOOST_COMPUTE_TOOLSET_NAME(__toolset_name)
 	COMPILER_VERSION(__version)
 
     if(__version AND (NOT (CMAKE_SYSTEM_NAME MATCHES "Darwin")))
