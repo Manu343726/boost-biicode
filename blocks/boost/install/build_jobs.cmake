@@ -97,10 +97,15 @@ function(BII_BOOST_BUILD_LIBS_PARALLEL LIBS B2_CALL VERBOSE BOOST_DIR)
 	foreach(lib ${LIBS})
 		message("Starting ${lib} library build job...")
 
-		execute(${B2_CALL} --with-${lib} WORKING_DIRECTORY ${BOOST_DIR}
-			    --success-callback __execute_success_handler
-			    --error-callback __job_error_handler
-			    --async)
+		if(CMAKE_CROSSCOMPILING)
+			# workaround: `execute' calls PowerShell when cross compiling from linux for windows
+			execute_process(COMMAND ${B2_CALL} --with-${lib} WORKING_DIRECTORY ${BOOST_DIR})
+		else()
+			execute(${B2_CALL} --with-${lib} WORKING_DIRECTORY ${BOOST_DIR}
+					  --success-callback __execute_success_handler
+					  --error-callback __job_error_handler
+					  --async)
+		endif()
 
 		ans(handle)
 		set(handles_list ${handles_list} ${handle})
